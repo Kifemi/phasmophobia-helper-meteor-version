@@ -1,0 +1,13 @@
+.evidence {
+  height: 150px;
+  width: 100%;
+  margin: 10px;
+  vertical-align: middle;
+}
+
+.ghosts {
+  height: auto;
+  width: 100%;
+  margin: 10px;
+  vertical-align: middle;
+}

@@ -1,0 +1,21 @@
+.evidenceBox {
+  border: 1px solid red;
+  width: 140px;
+  height: 80px;
+  font-size: 20px;
+  padding: 5px;
+  margin-top: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.selectedEvidence {
+  border: 2px solid green;
+}
+
+.evidencesForGhost {
+  background-color: yellow;
+  color: black;
+}

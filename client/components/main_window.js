@@ -4,6 +4,8 @@ import { withTracker } from 'meteor/react-meteor-data';
 import { Ghosts } from '../../imports/collections/ghosts';
 import { Evidence } from '../../imports/collections/evidence';
 
+import "../styles/main_window.css";
+
 function getGhosts(props, id) {
     let ghost = props[0].ghosts.find(ghost => ghost.id == id);
     if(ghost) {
@@ -25,10 +27,16 @@ function getEvidence(props, id) {
 function MainWindow(props) {
     ghost = getGhosts(props, 1)
     evidence = getEvidence(props, 1)
+
+
     return (
-        <div>
-            <h1>Name: {ghost.name} </h1>
-            <h1>Name: {evidence.name} </h1>
+        <div className="container">
+            <div className="row evidence">
+                {evidence.name}
+            </div>
+            <div className="row ghosts">
+                {ghost.name}
+            </div>
         </div>
     );
 };
