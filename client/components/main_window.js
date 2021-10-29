@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { withTracker } from 'meteor/react-meteor-data';
 
 import { Ghosts } from '../../imports/collections/ghosts';
 import { Evidence } from '../../imports/collections/evidence';
 
+import EvidenceBox from "./evidence";
+import GhostBox from "./ghost";
+
 import "../styles/main_window.css";
 
-function getGhosts(props, id) {
-    let ghost = props[0].ghosts.find(ghost => ghost.id == id);
+function getGhosts(list, id) {
+    let ghost = list.find(ghost => ghost.id == id);
     if(ghost) {
         return ghost;
     } else {
@@ -15,8 +18,8 @@ function getGhosts(props, id) {
     }
 }
 
-function getEvidence(props, id) {
-    let evidence = props[1].evidence.find(evidence => evidence.id == id);
+function getEvidence(list, id) {
+    let evidence = list.find(evidence => evidence.id == id);
     if(evidence) {
         return evidence;
     } else {
@@ -24,18 +27,44 @@ function getEvidence(props, id) {
     }
 }
 
-function MainWindow(props) {
-    ghost = getGhosts(props, 1)
-    evidence = getEvidence(props, 1)
+function handleGhostSelection1(selectedGhost, ghost) {
+    if(selectedGhost === ghost.id) {
+        setSelectedGhost(0);
+    } else {
+        setSelectedGhost(ghost.id);
+    }
+}
 
+function MainWindow(props) {
+    evidence = props[0].evidence
+    ghosts = props[1].ghosts
+
+    const [selectedEvidence, setSelectedEvidence] = useState([]);
+    const [selectedGhost, setSelectedGhost] = useState(0);
+    const [possibleGhosts, setPossibleGhosts] = useState(ghosts)
+
+    const handleGhostSelection = function(ghost) {
+        if(selectedGhost === ghost.id) {
+            setSelectedGhost(0);
+            setSelectedEvidence([]);
+        } else {
+            setSelectedGhost(ghost.id);
+            setSelectedEvidence(ghost.evidences);
+        }
+    }
 
     return (
         <div className="container">
-            <div className="row evidence">
-                {evidence.name}
+            <div className="row evidenceList">
+                {evidence.map(evidence => {
+                    return <EvidenceBox key={evidence.id} evidence={evidence} selectedEvidence={selectedEvidence} />
+                })}
             </div>
             <div className="row ghosts">
-                {ghost.name}
+                {ghosts.map(ghost => {
+                    return <GhostBox key={ghost.id} ghost={ghost} selectedGhost={selectedGhost} 
+                        ghostSelector={handleGhostSelection}/>
+                })}
             </div>
         </div>
     );
@@ -45,7 +74,7 @@ export default withTracker(() => {
     Meteor.subscribe('ghostsAndEvidence');
 
     return [
-        { ghosts: Ghosts.find({}).fetch() },
         { evidence: Evidence.find({}).fetch() },
+        { ghosts: Ghosts.find({}).fetch() },
     ];
 })(MainWindow);
