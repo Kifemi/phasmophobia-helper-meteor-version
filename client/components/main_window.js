@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { withTracker } from 'meteor/react-meteor-data';
 
 import { Ghosts } from '../../imports/collections/ghosts';
@@ -9,39 +9,20 @@ import GhostBox from "./ghost";
 
 import "../styles/main_window.css";
 
-function getGhosts(list, id) {
-    let ghost = list.find(ghost => ghost.id == id);
-    if(ghost) {
-        return ghost;
-    } else {
-        return { id: 0, name: "", evidences: [], Str: "", Weak: "" }
-    }
-}
-
-function getEvidence(list, id) {
-    let evidence = list.find(evidence => evidence.id == id);
-    if(evidence) {
-        return evidence;
-    } else {
-        return { id: 0, name: "" }
-    }
-}
-
-function handleGhostSelection1(selectedGhost, ghost) {
-    if(selectedGhost === ghost.id) {
-        setSelectedGhost(0);
-    } else {
-        setSelectedGhost(ghost.id);
-    }
-}
-
 function MainWindow(props) {
-    evidence = props[0].evidence
-    ghosts = props[1].ghosts
+    evidence = props[0]
+    ghosts = props[1]
 
     const [selectedEvidence, setSelectedEvidence] = useState([]);
     const [selectedGhost, setSelectedGhost] = useState(0);
-    const [possibleGhosts, setPossibleGhosts] = useState(ghosts)
+    const [possibleGhosts, setPossibleGhosts] = useState([]);
+    
+    useEffect(() => {
+        setPossibleGhosts(ghosts)
+    }, [ghosts])
+    useEffect(() => {
+        checkPossibleGhosts();
+    }, [selectedEvidence])
 
     const handleGhostSelection = function(ghost) {
         if(selectedGhost === ghost.id) {
@@ -49,19 +30,48 @@ function MainWindow(props) {
             setSelectedEvidence([]);
         } else {
             setSelectedGhost(ghost.id);
-            setSelectedEvidence(ghost.evidences);
         }
+    }
+
+    const handleEvidenceSelection = function(evidenceId) {
+        const index = selectedEvidence.indexOf(evidenceId);
+        let arrayCopy = selectedEvidence.slice();
+        if(index > -1) {
+            arrayCopy.splice(index, 1);
+        } else {
+            arrayCopy.push(evidenceId);
+        }
+        setSelectedEvidence(arrayCopy);
+        setSelectedGhost(0);
+        checkPossibleGhosts();
+    }
+
+    const checkPossibleGhosts = function() {
+        let possibleGhostTemp = [];
+        for(let i=0; i < ghosts.length; i++) {
+            let isPossible = true;
+            for(let j=0; j < selectedEvidence.length; j++) {
+                if(!ghosts[i].evidences.includes(selectedEvidence[j])) {
+                    isPossible = false;
+                };
+            };
+            if(isPossible) {
+                possibleGhostTemp.push(ghosts[i]);
+            }
+        }
+        setPossibleGhosts(possibleGhostTemp);
     }
 
     return (
         <div className="container">
             <div className="row evidenceList">
                 {evidence.map(evidence => {
-                    return <EvidenceBox key={evidence.id} evidence={evidence} selectedEvidence={selectedEvidence} />
+                    return <EvidenceBox key={evidence.id} evidence={evidence} selectedEvidence={selectedEvidence}
+                        evidenceSelector={handleEvidenceSelection} ghostEvidence={ghosts[selectedGhost - 1]} />
                 })}
             </div>
             <div className="row ghosts">
-                {ghosts.map(ghost => {
+                {possibleGhosts.map(ghost => {
                     return <GhostBox key={ghost.id} ghost={ghost} selectedGhost={selectedGhost} 
                         ghostSelector={handleGhostSelection}/>
                 })}
@@ -72,9 +82,10 @@ function MainWindow(props) {
 
 export default withTracker(() => {
     Meteor.subscribe('ghostsAndEvidence');
-
     return [
-        { evidence: Evidence.find({}).fetch() },
-        { ghosts: Ghosts.find({}).fetch() },
+        //{ evidence: Evidence.find({}, {sort: {id: 1}}).fetch() },
+        //{ ghosts: Ghosts.find({}, {sort: {id: 1}}).fetch() },
+        Evidence.find({}, {sort: {id: 1}}).fetch(),
+        Ghosts.find({}, {sort: {id: 1}}).fetch()
     ];
 })(MainWindow);

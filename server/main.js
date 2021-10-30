@@ -7,7 +7,6 @@ Meteor.startup(() => {
 	// Check how many ghosts are in the collection
   	const numberOfGhosts = Ghosts.find({}).count();
 	const numberOfEvidence = Evidence.find({}).count()
-
 	
 	// If no ghosts in the collection, insert them there
 	if(!numberOfGhosts) {

@@ -2,35 +2,24 @@ import React from 'react';
 
 import "../styles/evidence.css";
 
-//function checkIfEvidenceIsSelected(selectedEvidence, id) {
-//    return selectedEvidence.includes(id) ? true : false;
-//}
-//
-function checkGhostSelection(evidenceList, id) {
-    if(evidenceList) {
-        return (evidenceList.includes(id) && !checkIfEvidenceIsSelected())
-    }
-}
-
 function EvidenceBox(props) {
     const handleClick = function() {
-        console.log("click Evidence")
+        props.evidenceSelector(props.evidence.id)
     }
-   //const checkIfEvidenceIsSelected = function() {
-   //    if(props.selectedEvidence) {
-   //        return props.selectedEvidence.includes(props.evidence.id) ? true : false;
-   //    }  
-   //}
-   //${checkIfEvidenceIsSelected() ? "selectedEvidence" : ""} 
-    const checkGhostSelection = function() {
+    const checkIfEvidenceIsSelected = function() {
         if(props.selectedEvidence) {
-            console.log(props.selectedEvidence)
-            return (props.selectedEvidence.includes(props.evidence.id)) ? true : false;
+            return props.selectedEvidence.includes(props.evidence.id) ? true : false;
+        }  
+    }
+    const checkGhostSelection = function() {
+        if(props.ghostEvidence) {
+            return (props.ghostEvidence.evidences.includes(props.evidence.id)) ? true : false;
         }
     }
 
     return (
         <div className={`evidenceBox 
+            ${checkIfEvidenceIsSelected() ? "selectedEvidence" : ""} 
             ${checkGhostSelection() ? "evidenceForGhost" : ""} `}
             onClick={handleClick}>
             {props.evidence.name}
