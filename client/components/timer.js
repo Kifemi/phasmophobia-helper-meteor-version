@@ -8,6 +8,9 @@ class Timer extends Component {
         this.startTimer = this.startTimer.bind(this);
         this.countDown = this.countDown.bind(this);
         this.resetTimer = this.resetTimer.bind(this);
+        this.resetValue = 180;
+        this.timerOn = false;
+        this.timerMessage = "Off";
     }
 
     secondsToTime(secs) {
@@ -29,6 +32,10 @@ class Timer extends Component {
     startTimer() {
         if (this.timer == 0 && this.state.seconds > 0) {
             this.timer = setInterval(this.countDown, 1000);
+            this.timerOn = true;
+        } else {
+            clearInterval(this.timer, this.timer = 0);
+            this.timerOn = false;
         }
     }
 
@@ -38,110 +45,51 @@ class Timer extends Component {
             time: this.secondsToTime(seconds),
             seconds: seconds,
         });
-        console.log(this.state.time)
+        this.updateTimerMessage();
         if (seconds <= 0) {
-            clearInterval(this.timer);
+            clearInterval(this.timer, this.resetTimer(this.resetValue));
         }
     }
 
     resetTimer() {
-        clearInterval(this.timer);
+        this.timerMessage = "Off";
+        clearInterval(this.timer, this.timer = 0);
+        this.timerOn = false;  
         let timeLeftVar = this.secondsToTime(180);
         this.setState({ time: timeLeftVar, seconds: 180 });
     }
 
+    updateTimerMessage() {
+        if(this.state.seconds < 180 && this.state.seconds >= 90) {
+            this.timerMessage = "Safe";
+        } else if(this.state.seconds < 90) {
+            this.timerMessage = "Spirit can't hunt";
+        } else {
+            this.timerMessage = "Off";
+        }
+    }
+
     render() {
         return(
-            <div className="timer">
-                <span className="timer__part">{this.state.time.m}</span>
-                <span className="timer__part">:</span>
-                <span className="timer__part">{this.state.time.s}</span>
-                <button type="button" className="timer__btn timer__btn--control" onClick={this.startTimer}>
-                    <span className="material-icons">play_arrow</span>
-                </button>
-                <button type="button" className="timer__btn timer__btn--reset" onClick={this.resetTimer}>
-                    <span className="material-icons">timer</span>
-                </button>
-         </div>
+            <div>
+                <div className="timer">
+                    <span className="timer__part">{this.state.time.m}</span>
+                    <span className="timer__part">:</span>
+                    <span className="timer__part">{this.state.time.s}</span>
+                    <button type="button" className={`timer__btn ${this.timerOn ? "timer__btn--stop" : "timer__btn--start"} `} 
+                        onClick={this.startTimer}>
+                        {this.timerOn ? <span className="material-icons">pause</span> : <span className="material-icons">play_arrow</span>}
+                    </button>
+                    <button type="button" className="timer__btn" onClick={this.resetTimer}>
+                        <span className="material-icons">timer</span>
+                    </button>
+                </div>
+                <div className="timer timer__part">
+                    {this.timerMessage}
+                </div>
+            </div>
         );
     };
 }
 
 export default Timer;
-// function Timer() {
-//     let interval = null;
-//     //let remainingSeconds = 90;
-
-//     const [time, setTime] = useState([0, 0])
-//     const [remainingSeconds, setRemainingSeconds] = useState(90)
-
-//     const handleStartClick = function() {
-//         // TODO:
-//     }
-
-//     const handleStopClick = function() {
-//         // TODO:
-//     }
-
-//     const updateInterfaceTime = function() {
-//         const minutes = Math.floor(remainingSeconds / 60).toString().padStart(2, "0");
-//         const seconds = (remainingSeconds % 60).toString().padStart(2, "0");
-
-//         setTime([minutes, seconds]);
-//     }
-
-//     const updateInterfaceControls = function() {
-//         return interval === null ? true :false;  
-//     }
-
-//     const updateInterfaceIcons = function() {
-//         if(updateInterfaceControls() === true) {
-//             return <span className="material-icons">play_arrow</span>
-//         } else {
-//             return <span className="material-icons">pause</span>
-//         }
-//     }
-    
-//     const startTimer = function() {
-//         if(remainingSeconds === 0) return;
-//         interval = setInterval(() => {
-//             timeRemaining = remainingSeconds-1;
-//             setRemainingSeconds(timeRemaining);
-//             updateInterfaceTime();
-
-//             if(remainingSeconds <= 0) {
-//                 stop();
-//             }
-
-//             console.log(time)
-//         }, 1000);
-
-//         updateInterfaceIcons();
-//     }
-
-//     const stopTimer = function() {
-//         clearInterval(interval);
-
-//         interval = null;
-
-//         updateInterfaceIcons();
-//     }
-
-//     //startTimer();
-
-//     return (
-//         <div className="timer">
-//             <span className="timer__part timer__part--minutes">00</span>
-//             <span className="timer__part">:</span>
-//             <span className="timer__part timer__part--seconds">00</span>
-//             <button type="button" className={`timer__btn timer__btn--control ${updateInterfaceControls() ? "timer__btn--start" : "timer__btn--stop"} `}>
-//                 {updateInterfaceIcons()}
-//             </button>
-//             <button type="button" className="timer__btn timer__btn--reset">
-//                 <span className="material-icons">timer</span>
-//             </button>
-//         </div>
-//     )
-// }
-
-// export default Timer;

@@ -16,7 +16,6 @@ function EvidenceBox(props) {
             return (props.ghostEvidence.evidences.includes(props.evidence.id)) ? true : false;
         }
     }
-    console.log("Evidence render")
     return (
         <div className={`evidenceBox 
             ${checkIfEvidenceIsSelected() ? "selectedEvidence" : ""} 

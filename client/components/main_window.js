@@ -35,7 +35,6 @@ function MainWindow(props) {
     const handleGhostSelection = function(ghost) {
         if(selectedGhost === ghost.id) {
             setSelectedGhost(0);
-            //setSelectedEvidence([]);
         } else {
             setSelectedGhost(ghost.id);
         }
@@ -86,20 +85,12 @@ function MainWindow(props) {
         setSelectedGhost(0);
     }
 
-    // const spiritTimer = setInterval(function() {
-    //     if(timeLeft <= 0) {
-    //         clearInterval(spiritTimer);
-    //     };
-    //     document.getElementById("progressBar").value = 18000 - timeleft;
-    //     timeleft -= 1;
-    // }, 18000);
-
     return (
         <div className="container">
             <div className="row tools">
+                <Timer />
                 <button className="clearButton" onClick={handleClear}>Clear Evidence</button>
             </div>
-            <Timer />
             <div className="row evidenceList">
                 {possibleEvidence.map(evidence => {
                     return <EvidenceBox key={evidence.id} evidence={evidence} selectedEvidence={selectedEvidence}
