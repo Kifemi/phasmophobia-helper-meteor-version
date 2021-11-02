@@ -11,6 +11,7 @@ function GhostBox(props) {
         console.log("click Ghost")
         props.ghostSelector(props.ghost)
     };
+    console.log("Ghost render")
     return (
         <div className={`ghostBox ${checkIfGhostIsSelected(props.selectedGhost, props.ghost.id) ? "selectedGhost" : ""} `} 
             onClick={handleGhostClick}>

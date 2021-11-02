@@ -6,6 +6,7 @@ import { Evidence } from '../../imports/collections/evidence';
 
 import EvidenceBox from "./evidence";
 import GhostBox from "./ghost";
+import Timer from "./timer";
 
 import "../styles/main_window.css";
 
@@ -16,18 +17,25 @@ function MainWindow(props) {
     const [selectedEvidence, setSelectedEvidence] = useState([]);
     const [selectedGhost, setSelectedGhost] = useState(0);
     const [possibleGhosts, setPossibleGhosts] = useState([]);
+    const [possibleEvidence, setPossibleEvidence] = useState([]);
     
     useEffect(() => {
         setPossibleGhosts(ghosts)
     }, [ghosts])
     useEffect(() => {
-        checkPossibleGhosts();
+        setPossibleEvidence(evidence)
+    }, [evidence])
+    useEffect(() => {
+        setPossibleGhosts(checkPossibleGhosts());
     }, [selectedEvidence])
+    useEffect(() => {
+        setPossibleEvidence(checkPossibleEvidence());
+    }, [possibleGhosts])
 
     const handleGhostSelection = function(ghost) {
         if(selectedGhost === ghost.id) {
             setSelectedGhost(0);
-            setSelectedEvidence([]);
+            //setSelectedEvidence([]);
         } else {
             setSelectedGhost(ghost.id);
         }
@@ -43,7 +51,6 @@ function MainWindow(props) {
         }
         setSelectedEvidence(arrayCopy);
         setSelectedGhost(0);
-        checkPossibleGhosts();
     }
 
     const checkPossibleGhosts = function() {
@@ -59,13 +66,42 @@ function MainWindow(props) {
                 possibleGhostTemp.push(ghosts[i]);
             }
         }
-        setPossibleGhosts(possibleGhostTemp);
+        return possibleGhostTemp;
     }
+
+    const checkPossibleEvidence = function() {
+        let possibleEvidenceSet = new Set();
+        possibleGhosts.forEach(ghost => ghost.evidences.forEach(evidence => possibleEvidenceSet.add(evidence)));     
+        let possibleEvidenceTemp = []
+        evidence.map(evidence => {
+            if(possibleEvidenceSet.has(evidence.id)) {
+                possibleEvidenceTemp.push(evidence);
+            };
+        });
+        return possibleEvidenceTemp;
+    };
+
+    const handleClear = function() {
+        setSelectedEvidence([]);
+        setSelectedGhost(0);
+    }
+
+    // const spiritTimer = setInterval(function() {
+    //     if(timeLeft <= 0) {
+    //         clearInterval(spiritTimer);
+    //     };
+    //     document.getElementById("progressBar").value = 18000 - timeleft;
+    //     timeleft -= 1;
+    // }, 18000);
 
     return (
         <div className="container">
+            <div className="row tools">
+                <button className="clearButton" onClick={handleClear}>Clear Evidence</button>
+            </div>
+            <Timer />
             <div className="row evidenceList">
-                {evidence.map(evidence => {
+                {possibleEvidence.map(evidence => {
                     return <EvidenceBox key={evidence.id} evidence={evidence} selectedEvidence={selectedEvidence}
                         evidenceSelector={handleEvidenceSelection} ghostEvidence={ghosts[selectedGhost - 1]} />
                 })}
